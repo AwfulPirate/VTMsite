@@ -1,5 +1,5 @@
 (function(){
-  var app = angular.module("site", ["ngRoute", "ngTable", "termIndex", "firebase"]);
+  var app = angular.module("site", ["ngRoute", "ngTable", "termIndex", "firebase", "pascalprecht.translate"]);
 
   app.controller("NavController", function($location){
     this.isActive = function(viewLocation){
@@ -15,6 +15,10 @@
       })
       .when("/creator",{
         templateUrl: "./char_creator/charCreator.html",
+        controller: "CharCreatorController as creatorCtrl"
+      })
+      .when("/freecreator",{
+        templateUrl: "./free_creator/freeCreator.html",
         controller: "CharCreatorController as creatorCtrl"
       })
       .when("/glossary",{

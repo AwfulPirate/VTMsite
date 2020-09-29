@@ -14,6 +14,7 @@ app.service('CharCreatorService', [function(){
   this.charDemeanor = null;
   this.charGeneration = "13th";
   this.charSire = null;
+  this.loadedCharacter = false;
 
   this.getPlayer = function(){
     return this.charPlayer;

@@ -2,6 +2,9 @@ var app = angular.module("site");
 app.service('AttributesService', ['UglyService', 'CharCreatorService',
  function(UglyService, CharCreatorService){
 
+  this.loadedCharacter = false;
+  this.freeMode = location.hash.includes("free");
+  this.freeAttribute = freeAttribute;
   this.priorityChange = priorityChange;
   this.selectAttribute = selectAttribute;
   this.getPriority = getPriority;
@@ -47,7 +50,7 @@ app.service('AttributesService', ['UglyService', 'CharCreatorService',
         });
       }
 
-      this.select = function(index){
+      this.select = function(index, type){
         if(this.points[index].img=="./full.png" ||
            this.points[index].img=="./free.png")
         {
@@ -68,7 +71,7 @@ app.service('AttributesService', ['UglyService', 'CharCreatorService',
               return;
             }
             else{
-              if(CharCreatorService.freebieMode && point.img != "./full.png"){
+              if(type == "freebie" && point.img != "./full.png"){
                 point.img = "./free.png";
                 point.type = "freebie";
               }
@@ -87,6 +90,10 @@ app.service('AttributesService', ['UglyService', 'CharCreatorService',
           point.type = "";
         });
       };
+      if(vm.freeMode){
+        this.pointCount = 0;
+        this.zero();
+      }
     };
   };
 
@@ -151,12 +158,23 @@ app.service('AttributesService', ['UglyService', 'CharCreatorService',
   };
 
   function resetAttributes(){
-    this.attributeCategories.forEach(function(attrCat){
-      attrCat.attributes.forEach(function(attr){
-        attr.reset();
-        attr.pointCount = 1;
+    this.freeMode = location.hash.includes("free");
+    if(this.freeMode){
+      this.attributeCategories.forEach(function(attrCat){
+        attrCat.attributes.forEach(function(attr){
+          attr.zero();
+          attr.pointCount = 0;
+        });
       });
-    });
+    }
+    else{
+      this.attributeCategories.forEach(function(attrCat){
+        attrCat.attributes.forEach(function(attr){
+          attr.reset();
+          attr.pointCount = 1;
+        });
+      });
+    }
   };
 
   function resetPriorities(){
@@ -192,6 +210,17 @@ function getPriorityPts(priority){
   }
 };
 
+function freeAttribute(attribute, index, catIndex){
+  if(index == 0 && attribute.pointCount == 1){
+    attribute.pointCount = 0;
+    attribute.zero();
+  }
+  else{
+    attribute.pointCount = (index+1);
+    attribute.select(index, "original");
+  }
+}
+
 function selectAttribute(attribute, index, catIndex){
 
   if(attribute.name == "Appearance" && UglyService.isUgly()){
@@ -213,8 +242,6 @@ function selectAttribute(attribute, index, catIndex){
       return null;
 
     priorityPts = CharCreatorService.getFreebiePts();
-
-    if(index )
 
     if(index < attribute.pointCount - 1)
       pointDiff = (attribute.pointCount * 5) - ((index + 1) * 5);
@@ -266,6 +293,9 @@ function selectAttribute(attribute, index, catIndex){
   //Fill in the dots!
   attribute.select(index, "original");
 };
+
+
+
 
 function priorityChange(changedPriority, id, prevPriority){
   this.attributeCategories[id].priority = changedPriority;

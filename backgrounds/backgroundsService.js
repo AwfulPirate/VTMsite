@@ -3,14 +3,27 @@ var app = angular.module("site");
 app.service("BackgroundsService", ['CharCreatorService',
  function(CharCreatorService){
 
+   this.loadedCharacter = false;
+   this.freeBackgroundPt = freeBackgroundPt;
    this.backgroundPts = 5;
    this.selectBackgroundPt = selectBackgroundPt;
    this.chooseBackground = chooseBackground;
+   this.resetBackgrounds = resetBackgrounds;
 
    this.backgroundList = ["", "Allies", "Alternate Identity", "Black Hand Memebership",
                           "Contacts", "Domain", "Fame", "Generation",
                           "Herd", "Influence", "Mentor", "Resources",
                           "Retainers", "Rituals", "Status"];
+
+  function freeBackgroundPt(background, index){
+    if(index == 0 && background.pointCount == 1){
+      background.reset();
+    }
+    else{
+      background.pointCount=(index+1);
+      background.select(index, "original");
+  }
+  }
 
   function selectBackgroundPt(background, index){
     if(background.name == ""){
@@ -110,7 +123,7 @@ app.service("BackgroundsService", ['CharCreatorService',
              return;
            }
            else{
-             if(CharCreatorService.freebieMode && point.img != "./full.png"){
+             if(type == "freebie" && point.img != "./full.png"){
                point.img = "./free.png";
                point.type = "freebie";
              }
@@ -163,6 +176,13 @@ app.service("BackgroundsService", ['CharCreatorService',
  function removeBackground(index){
    this.selectedList[index].reset();
    delete this.selectedList[index];
+ }
+
+ function resetBackgrounds(){
+   this.backgroundPts = 5;
+   this.selectedList = {0: new Background(""), 1: new Background(""),
+                        2: new Background(""), 3: new Background(""),
+                        4: new Background(""), 5: new Background("")};
  }
 
 }]);

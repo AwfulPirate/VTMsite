@@ -4,19 +4,37 @@ app.controller("DisciplinesController",
  ['$scope', 'ClanService', 'DisciplineService',
  function($scope, ClanService, DisciplineService){
 
+   $scope.$on('$routeChangeSuccess', initScope);
+
+   var self = this;
+   function initScope(){
+     if(!DisciplineService.loadedCharacter){
+       DisciplineService.resetDisciplines();
+       self.selectedClanDisciplines = self.getDisciplines();
+     }
+   }
+
+   this.freeMode = location.hash.includes("free");
+   this.freeDisciplinePt = freeDisciplinePt;
+
    this.getFreebieMode = getFreebieMode;
    function getFreebieMode(){
      return DisciplineService.getFreebieMode();
    };
 
   this.isGargoyle = isGargoyle;
+  this.getDisciplines = getDisciplines;
   this.selectDisciplinePt = selectDisciplinePt;
   this.disciplinesPage = "./disciplines/disciplines.html";
-  
+
   this.disciplineList = getDisciplineList();
 
   function getDisciplineList(){
     return DisciplineService.disciplineList;
+  }
+
+  function freeDisciplinePt(discipline, index){
+    DisciplineService.freeDisciplinePt(discipline, index);
   }
 
   function selectDisciplinePt(discipline, index){
@@ -51,5 +69,11 @@ app.controller("DisciplinesController",
   function removeDiscipline(index){
     DisciplineService.removeDiscipline(index);
   };
+
+  $scope.$on('loadCharacter', function(){
+    DisciplineService.loadedCharacter = true;
+    self.selectedClanDisciplines = self.getDisciplines();
+    $scope.$apply();
+  })
 
 }]);

@@ -3,6 +3,8 @@ var app = angular.module("site");
 app.service("DisciplineService", ['ClanService', 'CharCreatorService', 'UglyService',
  function(ClanService, CharCreatorService, UglyService){
 
+  this.loadedCharacter = false;
+  this.freeDisciplinePt = freeDisciplinePt;
   this.setClan = setClan;
   this.setClanDisciplines = setClanDisciplines;
   this.selectDisciplinePt = selectDisciplinePt;
@@ -15,12 +17,12 @@ app.service("DisciplineService", ['ClanService', 'CharCreatorService', 'UglyServ
 
   this.disciplineList = ["Animalism", "Auspex", "Bardo", "Celerity",
                          "Chimerstry", "Daimonion", "Dementation",
-                         "Dominate", "Flight", "Fortitude", "Melpominee",
-                         "Mytherceria", "Necromancy", "Obeah", "Obfuscate",
-                         "Obtenebration", "Ogham", "Potence", "Presence",
-                         "Protean", "Quietus", "Sanguinus", "Serpentis",
-                         "Spiritus", "Temporis", "Thanatosis", "Thaumaturgy",
-                         "Valeren", "Vicissitude", "Visceratika"];
+                         "Dominate", "Flight", "Fortitude", "Koldunic Sorcery",
+                         "Melpominee", "Mytherceria", "Necromancy", "Obeah",
+                         "Obfuscate", "Obtenebration", "Ogham", "Potence",
+                         "Presence", "Protean", "Quietus", "Sanguinus",
+                         "Serpentis", "Spiritus", "Temporis", "Thanatosis",
+                         "Thaumaturgy", "Valeren", "Vicissitude", "Visceratika"];
 
   function changeDiscipline(discipline, index, prevDisc){
      this.selectedClanDisciplines[index] = new Discipline(discipline);
@@ -48,6 +50,17 @@ app.service("DisciplineService", ['ClanService', 'CharCreatorService', 'UglyServ
       this.selectedClanDisciplines[0].pointCount = 1;
     }
       return false;
+  }
+
+  function freeDisciplinePt(discipline, index){
+    if(index == 0 && discipline.pointCount == 1){
+      discipline.pointCount = 0;
+      discipline.zero();
+    }
+    else{
+      discipline.pointCount = (index+1);
+      discipline.select(index, "original");
+    }
   }
 
   function selectDisciplinePt(discipline, index){
@@ -130,7 +143,12 @@ app.service("DisciplineService", ['ClanService', 'CharCreatorService', 'UglyServ
                      {id: 2, img: "./empty.png", type:""},
                      {id: 3, img: "./empty.png", type:""},
                      {id: 4, img: "./empty.png", type:""}];
-
+      this.zero = function(){
+       this.points.forEach(function(point){
+         point.img = "./empty.png";
+         point.type = "";
+       });
+      };
       this.reset = function(){
         this.points.forEach(function(disciplinePt){
           if(disciplinePt.type == "freebie"){
@@ -172,7 +190,7 @@ app.service("DisciplineService", ['ClanService', 'CharCreatorService', 'UglyServ
               return;
             }
             else{
-              if(CharCreatorService.freebieMode && point.img != "./full.png"){
+              if(type == "freebie" && point.img != "./full.png"){
                 point.img = "./free.png";
                 point.type = type;
               }
@@ -233,5 +251,11 @@ app.service("DisciplineService", ['ClanService', 'CharCreatorService', 'UglyServ
     this.selectedClanDisciplines[index].reset();
     delete this.selectedClanDisciplines[index];
   };
+
+  this.resetDisciplines = resetDisciplines;
+  function resetDisciplines(){
+    this.selectedClanDisciplines = this.setClanDisciplines();
+    this.disciplinePts = 3;
+  }
 
 }]);
